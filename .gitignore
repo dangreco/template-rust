@@ -1,0 +1,4 @@
+.direnv
+.zed
+template/flake.lock
+template/Cargo.lock

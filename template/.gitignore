@@ -1,0 +1,8 @@
+.direnv
+.zed
+/target
+.cargo-ok
+.DS_Store
+{% if crate_type == "lib" %}
+Cargo.lock
+{% endif %}

@@ -1,0 +1,29 @@
+[template]
+cargo_generate_version = ">=0.20.0"
+exclude = [".git", "target", "**/.direnv", "**/.direnv/**"]
+
+[placeholders.gh-username]
+type = "string"
+prompt = "GitHub username (or organization)"
+# The username cannot end with a hyphen, too, but
+# this requirement is not captured by the regex at the moment.
+regex = "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$"
+
+[placeholders.project-description]
+type = "string"
+prompt = "Project description"
+
+[placeholders.rust-version]
+type = "string"
+prompt = "Rust version"
+regex = "^\\d+\\.\\d+\\.\\d+$"
+default = "1.88.0"
+
+[conditional.'crate_type == "lib"']
+ignore = ["src/main.rs"]
+
+[conditional.'crate_type == "bin"']
+ignore = ["src/lib.rs"]
+
+[hooks]
+post = ["cargo.toml.rhai"]
