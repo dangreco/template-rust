@@ -4,12 +4,16 @@ on:
     paths:
       - src/**/*
       - Cargo.toml
-      - Cargo.lock
+      {% if crate_type == "bin" %}
+      - "**/Cargo.lock"
+      {% endif %}
   push:
     paths:
       - src/**/*
       - Cargo.toml
-      - Cargo.lock
+      {% if crate_type == "bin" %}
+      - "**/Cargo.lock"
+      {% endif %}
 jobs:
   test:
     runs-on: ubuntu-latest

@@ -4,13 +4,13 @@ _default:
     @just --list
 
 _root:
-    @echo {{ root }}
+    @echo {% raw %}{{ root }}{% endraw %}
 
 _runtimes:
-    @{{ root }}/.scripts/runtimes.sh
+    @{{ root }}{% endraw %}/.scripts/runtimes.sh
 
 act *args:
-    @{{ root }}/.scripts/act.sh {{ args }}
+    @{% raw %}{{ root }}{% endraw %}/.scripts/act.sh {% raw %}{{ args }}{% endraw %}
 
 {% if crate_type == "bin" %}
 run:
