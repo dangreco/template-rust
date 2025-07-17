@@ -1,6 +1,5 @@
-/*
- * Copyright (C) 2025 Dan Greco <me@dangre.co>
- */
+// SPDX-License-Identifier: GPL-3.0-only
+
 #[cfg(test)]
 mod tests {
     #[test]
