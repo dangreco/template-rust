@@ -1,52 +1,67 @@
-name: Build Template
+name: Template
 on:
-  # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch
-  workflow_dispatch:
   schedule:
-    - cron: "0 18 * * 5"
+    - cron: "0 0 * * *"
   push:
-    branches: ["*"]
     paths-ignore:
       - "**/docs/**"
       - "**.md"
-
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      PROJECT_NAME: mytemplate
+      PROJECT_NAME: template
+      PROJECT_DESCRIPTION: "A template project"
+      GH_USERNAME: template
+    strategy:
+      matrix:
+        type: [bin, lib]
+    name: Build ${{ matrix.type }}
     steps:
       - uses: actions/checkout@v4
-
+      - uses: extractions/setup-just@v3
       - uses: cachix/install-nix-action@v31
         with:
           nix_path: nixpkgs=channel:nixos-unstable
           extra_nix_config: |
             experimental-features = nix-command flakes
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: cargo-generate/cargo-generate-action@latest
+      - uses: cargo-bins/cargo-binstall@main
+      - uses: actions-rs/toolchain@v1
         with:
-          name: ${{ env.PROJECT_NAME }}
-          arguments: "--define project-description=mytemplate --define gh-username=dangreco --destination=${{ runner.temp }}"
+          toolchain: "1.88.0"
+          override: true
+          components: rustfmt, clippy
+      - run: cargo binstall --no-confirm cargo-generate@0.22.1
+      - run: mkdir $RUNNER_TEMP/output
 
-      - name: Debug temp contents
+      - name: Generate template
         run: |
-          echo "Runner temp: ${{ runner.temp }}"
-          ls -R "${{ runner.temp }}"
+          cargo generate \
+            --${{ matrix.type }} \
+            --silent \
+            --allow-commands \
+            --path . \
+            --name ${{ env.PROJECT_NAME }} \
+            --destination $RUNNER_TEMP/output \
+            --define project-description="${{ env.PROJECT_DESCRIPTION }}" \
+            --define gh-username=${{ env.GH_USERNAME }}
 
-    # steps:
-    #   - uses: actions/checkout@v4
-    #   - uses: cargo-generate/cargo-generate-action@latest
-    #     with:
-    #       name: ${{ env.PROJECT_NAME }}
-    #   - uses: dtolnay/rust-toolchain@stable
-    #     with:
-    #       toolchain: stable
-    #   # we need to move the generated project to a temp folder, away from the template project
-    #   # otherwise `cargo` runs would fail
-    #   # see https://github.com/rust-lang/cargo/issues/9922
-    #   - run: |
-    #       mv $PROJECT_NAME ${{ runner.temp }}/
-    #       cd ${{ runner.temp }}/$PROJECT_NAME
-    #       cargo check
+      - name: Initialize Git repository
+        run: |
+          cd $RUNNER_TEMP/output/${{ env.PROJECT_NAME }}
+          git init -q
+          git add .
+
+      - name: Check template [Rust]
+        run: |
+          just \
+            --justfile $RUNNER_TEMP/output/${{ env.PROJECT_NAME }}/justfile \
+            --working-directory $RUNNER_TEMP/output/${{ env.PROJECT_NAME }} \
+            check
+
+      - name: Check template [Nix]
+        run: |
+          nix flake check \
+            --all-systems \
+            $RUNNER_TEMP/output/${{ env.PROJECT_NAME }}

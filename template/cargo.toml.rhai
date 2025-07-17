@@ -24,7 +24,6 @@ let pkg = switch type {
 };
 
 pkg.trim();
-print(pkg);
 
 let _toml = `
 [package]

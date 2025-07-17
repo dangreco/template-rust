@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2025 Dan Greco <me@dangre.co>
+ */
 #[cfg(test)]
 mod tests {
     #[test]
