@@ -4,45 +4,30 @@ _default:
     @just --list
 
 _root:
-    @echo {% raw %}{{ root }}{% endraw %}
+    @echo {{root}}
 
 _runtimes:
-    @{{ root }}{% endraw %}/.scripts/runtimes.sh
+    @{{root}}/.scripts/runtimes.sh
 
 act *args:
-    @{% raw %}{{ root }}{% endraw %}/.scripts/act.sh {% raw %}{{ args }}{% endraw %}
+    @{{root}}/.scripts/act.sh {{args}}
 
 {% if crate_type == "bin" %}
-run:
-    @cargo run
-
-run-release:
-    @cargo run --release
-
-build:
-    @cargo build
-
-build-release:
-    @cargo build --release
+build *args:
+    @cargo build --workspace --all-targets --all-features {{args}}
 
 {% endif %}
-test:
-    @cargo test --workspace --all-targets --all-features -- --nocapture
+test *args:
+    @cargo test --workspace --all-targets --all-features {{args}}
 
-test-release:
-    @cargo test --release --workspace --all-targets --all-features -- --nocapture
+check *args:
+    @cargo check {{args}}
 
-check:
-    @cargo check
+fmt *args:
+    @cargo fmt --all {{args}}
 
-check-release:
-    @cargo check --release
+clippy *args:
+    @cargo clippy --workspace --all-targets --all-features {{args}}
 
-fmt:
-    @cargo fmt --all
-
-fmt-check:
-    @cargo fmt --all -- --check
-
-clippy:
-    @cargo clippy --workspace --all-targets --all-features
+doc *args:
+    @cargo doc --no-deps --document-private-items --all-features --workspace

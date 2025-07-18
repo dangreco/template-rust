@@ -1,0 +1,110 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+env:
+  CARGO_INCREMENTAL: 0
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
+jobs:
+  ci-check-test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Just
+        uses: extractions/setup-just@v3
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          {% if rs-channel == "stable" %}
+          toolchain: {{ rs-version }}
+          {% elif rs-channel == "nightly" %}
+          toolchain: nightly-{{ rs-version }}
+          {% endif %}
+          default: true
+          override: true
+          profile: {{ rs-profile }}
+      - name: Setup cache
+        uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Run tests
+        run: just test
+
+  ci-check-rustfmt:
+    name: rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Just
+        uses: extractions/setup-just@v3
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          {% if rs-channel == "stable" %}
+          toolchain: {{ rs-version }}
+          {% elif rs-channel == "nightly" %}
+          toolchain: nightly-{{ rs-version }}
+          {% endif %}
+          default: true
+          override: true
+          profile: {{ rs-profile }}
+          components: rustfmt
+      - name: Setup cache
+        uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Check formatting
+        run: just fmt --check
+
+  ci-check-clippy:
+    name: clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Just
+        uses: extractions/setup-just@v3
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          {% if rs-channel == "stable" %}
+          toolchain: {{ rs-version }}
+          {% elif rs-channel == "nightly" %}
+          toolchain: nightly-{{ rs-version }}
+          {% endif %}
+          default: true
+          override: true
+          profile: {{ rs-profile }}
+          components: clippy
+      - name: Setup cache
+        uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Clippy check
+        run: just clippy -- -D warnings
+
+  ci-check-docs:
+    name: docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Just
+        uses: extractions/setup-just@v3
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          {% if rs-channel == "stable" %}
+          toolchain: {{ rs-version }}
+          {% elif rs-channel == "nightly" %}
+          toolchain: nightly-{{ rs-version }}
+          {% endif %}
+          default: true
+          override: true
+          profile: {{ rs-profile }}
+      - name: Setup cache
+        uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Check documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: just doc

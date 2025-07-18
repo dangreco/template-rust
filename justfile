@@ -10,5 +10,4 @@ _runtimes:
     @{{ root }}/.scripts/runtimes.sh
 
 act *args:
-    @{{ root }}/.scripts/act.sh {{ args }}
-
+    @{{ root }}/.scripts/act.sh -s GITHUB_TOKEN="$(gh auth token)" {{ args }}

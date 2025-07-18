@@ -1,5 +1,5 @@
 {
-  description = "{{project-name}} development environment";
+  description = "{{ gh-org }}/{{ gh-repo }} development environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -40,7 +40,7 @@
               just
               nixd
               nixfmt-rfc-style
-              (rust-bin.stable."{{rust-version}}".default.override {
+              (rust-bin.{{ rs-channel }}."{{ rs-version }}".{{ rs-profile }}.override {
                 extensions = [
                   "rust-src"
                   "rust-analyzer"

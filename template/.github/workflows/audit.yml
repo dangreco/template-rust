@@ -1,31 +1,38 @@
-name: Security audit
+name: Audit
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 0 * * *"
   push:
-    paths:
-      - "**/Cargo.toml"
-      {% if crate_type == "bin" %}
-      - "**/Cargo.lock"
-      {% endif %}
+    branches:
+      - main
   pull_request:
+env:
+  CARGO_INCREMENTAL: 0
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
 jobs:
   audit:
+    name: audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
         with:
-          toolchain: "1.88.0"
+          {% if rs-channel == "stable" %}
+          toolchain: {{ rs-version }}
+          {% elif rs-channel == "nightly" %}
+          toolchain: nightly-{{ rs-version }}
+          {% endif %}
+          default: true
           override: true
-          components: rustfmt, clippy
-      - uses: Swatinem/rust-cache@v2
-
-      {% if crate_type == "lib" %}
+          profile: {{ rs-profile }}
+      - name: Setup cache
+        uses: mozilla-actions/sccache-action@v0.0.9
       - name: Generate Cargo.lock
         run: cargo generate-lockfile
-
-      {% endif %}
       - name: Run security audit
         uses: rustsec/audit-check@v2.0.0
         with:

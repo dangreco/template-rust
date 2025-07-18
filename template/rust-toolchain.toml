@@ -1,3 +1,8 @@
 [toolchain]
-channel = "{{rust-version}}"
+{% if rs-channel == "stable" %}
+channel = "{{ rs-version }}"
+{% else %}
+channel = "nightly-{{ rs-version }}"
+{% endif %}
+profile = "{{ rs-profile }}"
 components = ["clippy", "rustfmt"]

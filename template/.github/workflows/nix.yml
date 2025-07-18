@@ -1,15 +1,15 @@
 name: "Nix"
 on:
-  pull_request:
-    paths:
-      - flake.nix
-      - flake.lock
   push:
     paths:
       - flake.nix
       - flake.lock
+  pull_request:
+    paths:
+      - flake.nix
+      - flake.lock
 jobs:
-  test:
+  nix-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

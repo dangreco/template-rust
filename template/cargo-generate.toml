@@ -2,28 +2,40 @@
 cargo_generate_version = ">=0.20.0"
 exclude = [".git", "target", "**/.direnv", "**/.direnv/**"]
 
-[placeholders.gh-username]
-type = "string"
-prompt = "GitHub username (or organization)"
-# The username cannot end with a hyphen, too, but
-# this requirement is not captured by the regex at the moment.
-regex = "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$"
-
 [placeholders.project-description]
 type = "string"
 prompt = "Project description"
 
-[placeholders.rust-version]
+[placeholders.gh-org]
+type = "string"
+prompt = "GitHub username/organization"
+regex = "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$"
+
+[placeholders.gh-repo]
+type = "string"
+prompt = "GitHub repository"
+regex = "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$"
+
+[placeholders.rs-channel]
+type = "string"
+prompt = "Rust channel"
+choices = ["stable", "nightly"]
+default = "stable"
+
+[placeholders.rs-version]
 type = "string"
 prompt = "Rust version"
-regex = "^\\d+\\.\\d+\\.\\d+$"
+regex = "^(\\d+\\.\\d+\\.\\d+|\\d{4}-\\d{2}-\\d{2})$"
 default = "1.88.0"
+
+[placeholders.rs-profile]
+type = "string"
+prompt = "Rust profile"
+choices = ["default", "minimal"]
+default = "default"
 
 [conditional.'crate_type == "lib"']
 ignore = ["src/main.rs"]
 
 [conditional.'crate_type == "bin"']
 ignore = ["src/lib.rs"]
-
-[hooks]
-post = ["cargo.toml.rhai"]

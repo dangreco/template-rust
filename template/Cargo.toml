@@ -1,5 +1,5 @@
 [package]
-name = "{{project-name}}"
+name = "{{ project-name }}"
 version.workspace = true
 edition.workspace = true
 description.workspace = true
@@ -7,28 +7,36 @@ license.workspace = true
 homepage.workspace = true
 documentation.workspace = true
 repository.workspace = true
+{% if rs-channel == "stable" %}
 rust-version.workspace = true
+{% endif %}
 
 [workspace]
 members = []
 
 [workspace.package]
+publish = false
 version = "0.1.0"
 edition = "2024"
-description = "{{project-description}}"
+description = "{{ project-description }}"
 license = "GPL-3.0-only"
-homepage = "https://github.com/{{gh-username}}/{{project-name}}"
-documentation = "https://github.com/{{gh-username}}/{{project-name}}"
-repository = "https://github.com/{{gh-username}}/{{project-name}}"
-rust-version = "{{rust-version}}"
-publish = false
+homepage = "https://github.com/{{ gh-org }}/{{ gh-repo }}"
+documentation = "https://docs.rs/{{ project-name }}"
+repository = "https://github.com/{{ gh-org }}/{{ gh-repo }}"
+{% if rs-channel == "stable" %}
+rust-version = "{{ rs-version }}"
+{% endif %}
 
+{% if crate_type == "lib" %}
 [lib]
 doctest = false
+{% endif %}
 
+{% if crate_type == "bin" %}
 [[bin]]
-name = "{{project-name}}"
+name = "{{ project-name }}"
 path = "src/main.rs"
+{% endif %}
 
 [lints]
 workspace = true

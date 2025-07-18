@@ -28,6 +28,7 @@
           nativeBuildInputs =
             with pkgs;
             [
+              gh
               git
               act
               just
